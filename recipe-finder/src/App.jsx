@@ -6,37 +6,40 @@ function App() {
   const [query, setQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
 
+  const API_URL = import.meta.env.VITE_RECIPE_API;
+
   const searchRecipes = async (e) => {
     e.preventDefault();
     if (!query) return;
 
-    const APP_ID = import.meta.env.VITE_APP_ID;
-    const APP_KEY = import.meta.env.VITE_APP_KEY;
-
     try {
-      const res = await axios.get(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`);
-      setRecipes(res.data.hits);
+      const res = await axios.get(`${API_URL}${query}`);
+      setRecipes(res.data.meals || []);
     } catch (err) {
       console.error("Error fetching recipes:", err);
     }
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-6">Recipe Finder</h1>
-      <form onSubmit={searchRecipes} className="flex gap-2 mb-6">
+    <div className="container py-5">
+      <h1 className="text-center mb-4">Recipe Finder</h1>
+
+      <form onSubmit={searchRecipes} className="d-flex gap-2 mb-4">
         <input
           type="text"
-          className="flex-1 p-2 border rounded"
+          className="form-control"
           placeholder="Search for a recipe..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Search</button>
+        <button type="submit" className="btn btn-success">Search</button>
       </form>
-      <div className="grid gap-4 md:grid-cols-2">
+
+      <div className="row g-4">
         {recipes.map((recipe, index) => (
-          <RecipeCard key={index} recipe={recipe.recipe} />
+          <div className="col-md-6" key={index}>
+            <RecipeCard recipe={recipe} />
+          </div>
         ))}
       </div>
     </div>
